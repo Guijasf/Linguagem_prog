@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
 
 
-# --------------------------------------------------
+# ==========================================================
 # CONFIGURAÇÃO DA PÁGINA
-# --------------------------------------------------
+# ==========================================================
 
 st.set_page_config(
     page_title="Dashboard de Vendas",
@@ -12,33 +13,56 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Dashboard de Vendas")
+st.title("📊 Dashboard de Vendas")
 
 
-# --------------------------------------------------
+# ==========================================================
 # CARREGAMENTO DOS DADOS
-# --------------------------------------------------
-
-@from pathlib import Path
+# ==========================================================
 
 @st.cache_data
 def carregar_dados():
-    caminho_arquivo = Path(__file__).parent / "vendas.csv"
 
-    df = pd.read_csv(caminho_arquivo)
+    # Localiza a pasta onde o meu_dashboard.py está
+    pasta_atual = Path(__file__).parent
 
-    df["Data"] = pd.to_datetime(df["Data"])
+    # Procura o vendas.csv nessa mesma pasta
+    caminho_csv = pasta_atual / "vendas.csv"
+
+    # Lê o arquivo
+    df = pd.read_csv(caminho_csv)
+
+    # Converte a coluna Data para data
+    df["Data"] = pd.to_datetime(
+        df["Data"],
+        errors="coerce"
+    )
+
+    # Converte Receita para número
+    df["Receita"] = pd.to_numeric(
+        df["Receita"],
+        errors="coerce"
+    )
 
     return df
 
 
-# --------------------------------------------------
+# Carrega os dados
+df = carregar_dados()
+
+
+# ==========================================================
 # FILTROS LATERAIS
-# --------------------------------------------------
+# ==========================================================
 
 st.sidebar.title("Filtros")
 
-lista_de_categorias = sorted(df["Categoria"].dropna().unique())
+lista_de_categorias = sorted(
+    df["Categoria"]
+    .dropna()
+    .unique()
+    .tolist()
+)
 
 categorias_selecionadas = st.sidebar.multiselect(
     "Selecione as Categorias",
@@ -47,74 +71,91 @@ categorias_selecionadas = st.sidebar.multiselect(
 )
 
 
-# --------------------------------------------------
+# ==========================================================
 # FILTRAGEM DOS DADOS
-# --------------------------------------------------
+# ==========================================================
 
 if categorias_selecionadas:
+
     df_filtrado = df[
         df["Categoria"].isin(categorias_selecionadas)
-    ]
+    ].copy()
+
 else:
+
     df_filtrado = df.copy()
 
 
-# --------------------------------------------------
+# ==========================================================
 # MÉTRICAS
-# --------------------------------------------------
+# ==========================================================
 
 receita_calculada = df_filtrado["Receita"].sum()
 
-# Caso cada linha represente um pedido
 total_pedidos = len(df_filtrado)
 
 
 col1, col2 = st.columns([1, 1])
 
+
 with col1:
+
     st.metric(
-        label="Receita Total",
+        label="💰 Receita Total",
         value=f"R$ {receita_calculada:,.2f}"
     )
 
+
 with col2:
+
     st.metric(
-        label="Total de Pedidos",
+        label="📦 Total de Pedidos",
         value=total_pedidos
     )
 
 
-# --------------------------------------------------
+# ==========================================================
 # ABAS
-# --------------------------------------------------
+# ==========================================================
 
-aba1, aba2 = st.tabs([
-    "Evolução Mensal",
-    "Tabela de Dados"
-])
+aba1, aba2 = st.tabs(
+    [
+        "📈 Evolução Mensal",
+        "📋 Tabela de Dados"
+    ]
+)
 
 
-# --------------------------------------------------
-# ABA 1 - GRÁFICO
-# --------------------------------------------------
+# ==========================================================
+# ABA 1 - EVOLUÇÃO MENSAL
+# ==========================================================
 
 with aba1:
 
     st.subheader("Evolução Mensal da Receita")
 
-    dados_mensais = (
-        df_filtrado
-        .set_index("Data")
-        .resample("ME")["Receita"]
-        .sum()
-    )
+    if not df_filtrado.empty:
 
-    st.area_chart(dados_mensais)
+        dados_mensais = (
+            df_filtrado
+            .dropna(subset=["Data"])
+            .set_index("Data")
+            .resample("ME")["Receita"]
+            .sum()
+        )
+
+        st.area_chart(dados_mensais)
+
+    else:
+
+        st.warning(
+            "Não existem dados para os filtros selecionados."
+        )
 
 
-# --------------------------------------------------
+# ==========================================================
 # ABA 2 - TABELA
-# --------------------------------------------------
+# ==========================================================
 
 with aba2:
 
@@ -126,16 +167,17 @@ with aba2:
     )
 
 
-    # --------------------------------------------------
-    # EXPORTAÇÃO CSV
-    # --------------------------------------------------
+    # ======================================================
+    # DOWNLOAD CSV
+    # ======================================================
 
     csv = df_filtrado.to_csv(
         index=False
     ).encode("utf-8")
 
+
     st.download_button(
-        label="Baixar dados filtrados em CSV",
+        label="⬇️ Baixar dados filtrados em CSV",
         data=csv,
         file_name="vendas_filtradas.csv",
         mime="text/csv"
