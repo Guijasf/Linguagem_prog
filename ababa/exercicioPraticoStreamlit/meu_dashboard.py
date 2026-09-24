@@ -19,17 +19,17 @@ st.title("Dashboard de Vendas")
 # CARREGAMENTO DOS DADOS
 # --------------------------------------------------
 
+@from pathlib import Path
+
 @st.cache_data
 def carregar_dados():
-    df = pd.read_csv("vendas.csv")
+    caminho_arquivo = Path(__file__).parent / "vendas.csv"
 
-    # Converter a coluna Data para formato de data
+    df = pd.read_csv(caminho_arquivo)
+
     df["Data"] = pd.to_datetime(df["Data"])
 
     return df
-
-
-df = carregar_dados()
 
 
 # --------------------------------------------------
