@@ -60,9 +60,9 @@ Os arquivos estão preparados; nenhum serviço foi publicado automaticamente.
 5. Verifique os três links em janela anônima e teste um filtro. Entregue os links do GitHub, Pages e Streamlit, além do notebook, código e base conforme a atividade.
 
 ### Links de entrega — preencher após publicar
-- GitHub: pendente.
-- GitHub Pages: pendente.
-- Streamlit: pendente.
+- GitHub: https://github.com/Guijasf/Linguagem_prog
+- GitHub Pages: https://guijasf.github.io/Linguagem_prog/projeto-mercado-imobiliario/
+- Streamlit: https://linguagemprog-krw6j7ucjan67pkfntmvg5.streamlit.app/
 
 O SQLite é recriado quando necessário. No Streamlit Cloud, o armazenamento local pode ser temporário. A fonte definitiva do projeto é o CSV versionado.
 
