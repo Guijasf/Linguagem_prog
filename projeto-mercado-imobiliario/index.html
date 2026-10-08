@@ -1,19 +1,300 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Observatório Imobiliário | Guilherme Amaral</title><style>
-*{box-sizing:border-box}body{margin:0;background:#f3f5f4;color:#19313c;font-family:system-ui,sans-serif;line-height:1.65}header{background:#122e3b;color:#fff;padding:72px max(6vw,20px)}header small{color:#83d3c8;letter-spacing:3px}h1{font-size:clamp(34px,5vw,64px);line-height:1.1;max-width:850px;margin:24px 0}header p{max-width:720px;color:#d6e3e7}main{max-width:1150px;margin:auto;padding:35px 20px}section{margin:24px 0;padding:28px;background:white;border:1px solid #dce5e7;border-radius:14px}h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.card{background:#edf5f3;padding:23px;border-radius:12px}.card strong{font-size:27px;display:block}img{width:100%;height:auto}a{color:#087080}nav a{display:inline-block;padding:12px 18px;margin:8px 8px 0 0;background:#087e8b;color:white;border-radius:7px;text-decoration:none}.tag{font-size:13px;color:#45606b}footer{padding:30px;text-align:center}.note{border-left:4px solid #d58b32;padding-left:18px}</style></head><body>
-<header><small>ANÁLISE DE DADOS / TEMA 12 / G1</small><h1>Um olhar sobre o mercado imobiliário.</h1><p>Preço, localização e evolução temporal em uma base simulada de 2015 a 2024.</p><p>Guilherme Familiar do Amaral</p><nav><a href="#resultados">Explorar resultados</a><a href="notebooks/analise_mercado_imobiliario.ipynb">Baixar notebook</a></nav></header><main>
-<div class="grid"><div class="card"><span>Observações simuladas</span><strong>4.440</strong></div><div class="card"><span>Cidades / UFs</span><strong>37 / 20</strong></div><div class="card"><span>Preço médio da amostra</span><strong>R$ 682.299,26</strong></div></div>
-<section><h2>O que queremos investigar?</h2><p>Quais cidades e regiões apresentam maiores preços? Como as médias variam no tempo? Qual tipo de imóvel possui maior valor? Existe associação entre área, renda e preço?</p><p>O projeto integra preparação de dados, indicadores, análise exploratória, banco SQLite e dashboard com sete filtros.</p></section>
-<section id="resultados"><h2>Uma década em perspectiva</h2><img src="imagens/evolucao.png" alt="Gráfico de médias e medianas mensais de preços entre 2015 e 2024"><p>Médias e medianas ajudam a identificar oscilações e o efeito dos valores extremos. Os registros não acompanham os mesmos imóveis.</p></section>
-<section><h2>Diferenças regionais</h2><img src="imagens/heatmap.png" alt="Heatmap dos preços médios por região e ano, em milhares de reais"></section>
-<section><h2>Conclusão da amostra</h2><p>No recorte de 4,440 observações, Serra apresenta o maior preço médio, Sul lidera entre as regiões e Apartamento tem o maior preço médio entre os tipos. A correlação de Pearson entre renda e preço é -0.011. A média das variações anuais comparáveis é 0.32%. As médias refletem a composição da amostra; não acompanham os mesmos imóveis. Os dados são simulados e não permitem conclusões sobre o mercado brasileiro real, causalidade ou recomendações de investimento.</p><p class="note">Dados simulados, cobertura parcial e valores nominais. Os resultados não constituem uma estimativa do mercado imobiliário brasileiro real.</p></section>
-<section><h2>Tratamento que faz diferença</h2><p>A coluna original de preço/m² foi preservada para auditoria. Os indicadores utilizam preço dividido por área, corrigindo a inconsistência matemática. Outliers são sinalizados e mantidos.</p><p>As funcionalidades avançadas são persistência com SQLAlchemy + SQLite e correlação estatística. Python, Pandas, Matplotlib, Seaborn e Streamlit compõem a aplicação.</p></section>
-<section><h2>Explore o projeto</h2><nav><a href="README.md">Instruções</a><a href="app.py">Código do dashboard</a><a href="dados/simulacao_mercado_imobiliario_brasil.csv">Base de dados</a></nav><!-- LINKS DE PUBLICAÇÃO: substituir o parágrafo abaixo por links reais após publicar. --><nav>
-  <a href="https://linguagemprog-krw6j7ucjan67pkfntmvg5.streamlit.app/"
-     target="_blank" rel="noopener noreferrer">
-    Acessar dashboard
-  </a>
-  <a href="https://github.com/Guijasf/Linguagem_prog"
-     target="_blank" rel="noopener noreferrer">
-    Ver repositório
-  </a>
-</nav><p>Fonte: <a href="https://github.com/AlexandreLouzada/Dados-Simulados-G1">Dados simulados do professor Alexandre Louzada</a>.</p></section></main><footer>Projeto acadêmico · Análise e Visualização de Dados com Python · 2026</footer></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Observatório Imobiliário | Guilherme Amaral</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f3f5f4;
+      color: #19313c;
+      font-family: system-ui, sans-serif;
+      line-height: 1.65;
+    }
+
+    header {
+      background: #122e3b;
+      color: #fff;
+      padding: 72px max(6vw, 20px);
+    }
+
+    header small {
+      color: #83d3c8;
+      letter-spacing: 3px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 64px);
+      line-height: 1.1;
+      max-width: 850px;
+      margin: 24px 0;
+    }
+
+    header p {
+      max-width: 720px;
+      color: #d6e3e7;
+    }
+
+    .identificacao {
+      margin: 24px 0;
+      padding-left: 18px;
+      border-left: 4px solid #83d3c8;
+    }
+
+    .identificacao strong {
+      color: #fff;
+    }
+
+    main {
+      max-width: 1150px;
+      margin: auto;
+      padding: 35px 20px;
+    }
+
+    section {
+      margin: 24px 0;
+      padding: 28px;
+      background: white;
+      border: 1px solid #dce5e7;
+      border-radius: 14px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #edf5f3;
+      padding: 23px;
+      border-radius: 12px;
+    }
+
+    .card strong {
+      font-size: 27px;
+      display: block;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: #087080;
+    }
+
+    nav a {
+      display: inline-block;
+      padding: 12px 18px;
+      margin: 8px 8px 0 0;
+      background: #087e8b;
+      color: white;
+      border-radius: 7px;
+      text-decoration: none;
+    }
+
+    .tag {
+      font-size: 13px;
+      color: #45606b;
+    }
+
+    footer {
+      padding: 30px;
+      text-align: center;
+    }
+
+    .note {
+      border-left: 4px solid #d58b32;
+      padding-left: 18px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <small>ANÁLISE DE DADOS / TEMA 12 / G1</small>
+
+    <h1>Um olhar sobre o mercado imobiliário.</h1>
+
+    <p>
+      Preço, localização e evolução temporal em uma base simulada
+      de 2015 a 2024.
+    </p>
+
+    <div class="identificacao">
+      <p>
+        <strong>Disciplina:</strong>
+        Análise e Visualização de Dados com Python<br>
+
+        <strong>Professor:</strong>
+        Alexandre Neves Louzada<br>
+
+        <strong>Aluno:</strong>
+        Guilherme Familiar do Amaral
+      </p>
+    </div>
+
+    <nav>
+      <a href="#resultados">Explorar resultados</a>
+      <a href="notebooks/analise_mercado_imobiliario.ipynb" download>
+        Baixar notebook
+      </a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="grid">
+      <div class="card">
+        <span>Observações simuladas</span>
+        <strong>4.440</strong>
+      </div>
+
+      <div class="card">
+        <span>Cidades / UFs</span>
+        <strong>37 / 20</strong>
+      </div>
+
+      <div class="card">
+        <span>Preço médio da amostra</span>
+        <strong>R$ 682.299,26</strong>
+      </div>
+    </div>
+
+    <section>
+      <h2>O que queremos investigar?</h2>
+
+      <p>
+        Quais cidades e regiões apresentam maiores preços?
+        Como as médias variam no tempo?
+        Qual tipo de imóvel possui maior valor?
+        Existe associação entre área, renda e preço?
+      </p>
+
+      <p>
+        O projeto integra preparação de dados, indicadores,
+        análise exploratória, banco SQLite e dashboard com sete filtros.
+      </p>
+    </section>
+
+    <section id="resultados">
+      <h2>Uma década em perspectiva</h2>
+
+      <img
+        src="imagens/evolucao.png"
+        alt="Gráfico de médias e medianas mensais de preços entre 2015 e 2024"
+      >
+
+      <p>
+        Médias e medianas ajudam a identificar oscilações e o efeito
+        dos valores extremos. Os registros não acompanham os mesmos imóveis.
+      </p>
+    </section>
+
+    <section>
+      <h2>Diferenças regionais</h2>
+
+      <img
+        src="imagens/heatmap.png"
+        alt="Heatmap dos preços médios por região e ano, em milhares de reais"
+      >
+    </section>
+
+    <section>
+      <h2>Conclusão da amostra</h2>
+
+      <p>
+        No recorte de 4.440 observações, Serra apresenta o maior preço
+        médio, Sul lidera entre as regiões e Apartamento tem o maior
+        preço médio entre os tipos. A correlação de Pearson entre renda
+        e preço é -0,011. A média das variações anuais comparáveis é 0,32%.
+        As médias refletem a composição da amostra; não acompanham os
+        mesmos imóveis. Os dados são simulados e não permitem conclusões
+        sobre o mercado brasileiro real, causalidade ou recomendações
+        de investimento.
+      </p>
+
+      <p class="note">
+        Dados simulados, cobertura parcial e valores nominais.
+        Os resultados não constituem uma estimativa do mercado
+        imobiliário brasileiro real.
+      </p>
+    </section>
+
+    <section>
+      <h2>Tratamento que faz diferença</h2>
+
+      <p>
+        A coluna original de preço/m² foi preservada para auditoria.
+        Os indicadores utilizam preço dividido por área, corrigindo
+        a inconsistência matemática. Outliers são sinalizados e mantidos.
+      </p>
+
+      <p>
+        As funcionalidades avançadas são persistência com
+        SQLAlchemy + SQLite e correlação estatística.
+        Python, Pandas, Matplotlib, Seaborn e Streamlit
+        compõem a aplicação.
+      </p>
+    </section>
+
+    <section>
+      <h2>Explore o projeto</h2>
+
+      <nav>
+        <a href="README.md">Instruções</a>
+        <a href="app.py">Código do dashboard</a>
+        <a href="dados/simulacao_mercado_imobiliario_brasil.csv">
+          Base de dados
+        </a>
+      </nav>
+
+      <nav>
+        <a
+          href="https://linguagemprog-krw6j7ucjan67pkfntmvg5.streamlit.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Acessar dashboard
+        </a>
+
+        <a
+          href="https://github.com/Guijasf/Linguagem_prog"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Ver repositório
+        </a>
+      </nav>
+
+      <p>
+        Fonte:
+        <a
+          href="https://github.com/AlexandreLouzada/Dados-Simulados-G1"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Dados simulados do professor Alexandre Louzada
+        </a>.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Projeto acadêmico · Análise e Visualização de Dados com Python · 2026<br>
+    Professor: Alexandre Neves Louzada<br>
+    Aluno: Guilherme Familiar do Amaral
+  </footer>
+</body>
+</html>
