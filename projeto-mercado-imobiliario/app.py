@@ -38,7 +38,7 @@ st.caption('Tema 12 · Avaliação G1')
 
 st.markdown(
     """
-**Disciplina:** Análise e Visualização de Dados com Python  
+**Disciplina:** Linguagens de Programação  
 **Professor:** Alexandre Neves Louzada  
 **Aluno:** Guilherme Familiar do Amaral
 """
