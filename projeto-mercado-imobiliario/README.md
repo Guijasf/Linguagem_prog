@@ -1,5 +1,5 @@
 # Observatório do Mercado Imobiliário Brasileiro
-**Guilherme Familiar do Amaral · Tema 12 · Avaliação G1**
+**Linguagens de Programação · Alexandre Neves Louzada · Guilherme Familiar do Amaral · Tema 12 · Avaliação G1**
 
 Análise de 4.440 observações simuladas, de 2015 a 2024, com 37 cidades e 20 UFs. Perguntas: quais cidades, regiões e tipos têm maior preço médio? Como as médias evoluem? Qual a associação entre área, renda e preço?
 
